@@ -18,4 +18,4 @@ vim-vimhelplint
 
 2. Open vim and edit your help file. `:edit path/to/your_help_file.txt`
 
-3. Execute a ex command `:VimhelpLint`, and `:copen` to check quickfix window. If you use ':VimhelpLint!', then it opens quickfix window automatically.
+3. Execute an ex command `:VimhelpLint`, then it registers errors to quickfix list. Thus, for example, use `:copen` to check quickfix window. If you use `:VimhelpLint!`, it opens quickfix window automatically.
