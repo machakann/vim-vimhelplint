@@ -132,15 +132,16 @@ function! s:extract_hypertexts_from_a_line(lnum, line) abort  "{{{
   let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'tag', '\*\zs[#-)!+-{}~]\+\ze\*\%(\s\|$\)')
 
   " extract links
-  let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'link', '\%(^\|[^\\]\)|\zs[#-)!+-{}~]\+\ze|')
+  let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'link', '\%(^\|[^\\]\)|\zs[#-)!+-{}~]\+\ze|', '\%(|||\|.*====*|\|:|vim:|\)')
 
   " extract options as link
-  let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'link', '\C''\%([a-z]\{2,}\|t_..\)''')
+  let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'link', '\C''\%([a-z]\{2,}\|t_..\)''', '\s*\zs.\{-}\ze\s\=\~$')
 
   return list
 endfunction
 "}}}
-function! s:extract_a_kind_of_hypertexts(lnum, line, kind, pattern) abort  "{{{
+function! s:extract_a_kind_of_hypertexts(lnum, line, kind, pattern, ...) abort  "{{{
+  let exceptpat = get(a:000, 0, '')
   let list = []
   let l:count = 1
   while 1
@@ -149,13 +150,32 @@ function! s:extract_a_kind_of_hypertexts(lnum, line, kind, pattern) abort  "{{{
     let start = match(a:line, a:pattern, 0, l:count)
     if start > -1
       let str = matchstr(a:line, a:pattern, 0, l:count)
-      let list += [{'kind': a:kind, 'name': str, 'lnum': a:lnum, 'start': start}]
+      if exceptpat ==# '' || !s:is_except_pattern(a:line, exceptpat, start)
+        let list += [{'kind': a:kind, 'name': str, 'lnum': a:lnum, 'start': start}]
+      endif
     else
       break
     endif
     let l:count += 1
   endwhile
   return list
+endfunction
+"}}}
+function! s:is_except_pattern(line, exceptpat, idx) abort "{{{
+  let result  = 0
+  let l:count = 1
+  while 1
+    let except_start = match(a:line, a:exceptpat, 0, l:count)
+    let except_end   = matchend(a:line, a:exceptpat, 0, l:count)
+    if except_start < 0 || except_end < 0
+      break
+    elseif a:idx >= except_start && a:idx < except_end
+      let result = 1
+      break
+    endif
+    let l:count += 1
+  endwhile
+  return result
 endfunction
 "}}}
 function! s:escape(string) abort  "{{{
