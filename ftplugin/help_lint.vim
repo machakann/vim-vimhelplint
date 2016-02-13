@@ -533,16 +533,21 @@ function! s:compare_bufnr_and_name(i1, i2) abort  "{{{
   return result
 endfunction
 "}}}
-function! s:compare_pos(i1, i2) abort "{{{
-  let pos1 = [a:i1.lnum, a:i1.col]
-  let pos2 = [a:i2.lnum, a:i2.col]
-  if s:is_ahead(pos1, pos2)
-    return 1
-  elseif s:is_ahead(pos2, pos1)
-    return -1
+function! s:compare_qfitems(i1, i2) abort "{{{
+  if a:i1.bufnr != a:i2.bufnr
+    let result a:i1.bufnr - a:i2.bufnr
   else
-    return 0
+    let pos1 = [a:i1.lnum, a:i1.col]
+    let pos2 = [a:i2.lnum, a:i2.col]
+    if s:is_ahead(pos1, pos2)
+      let result = 1
+    elseif s:is_ahead(pos2, pos1)
+      let result = -1
+    else
+      let result = 0
+    endif
   endif
+  return result
 endfunction
 "}}}
 function! s:is_ahead(pos1, pos2) abort  "{{{
