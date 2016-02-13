@@ -135,7 +135,7 @@ function! s:extract_hypertexts_from_a_line(lnum, line) abort  "{{{
   let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'link', '\%(^\|[^\\]\)|\zs[#-)!+-{}~]\+\ze|')
 
   " extract options as link
-  let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'link', '''\%([[:alpha:]]\{2,}\|t_..\)''')
+  let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'link', '\C''\%([a-z]\{2,}\|t_..\)''')
 
   return list
 endfunction
