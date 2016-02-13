@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 12-Feb-2016.
+" Last Change: 13-Feb-2016.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -394,7 +394,7 @@ endfunction
 function! s:fuzzy_pattern(word) abort "{{{
   " FIXME: Ah... Does anyone have good idea?
 
-  let charlist = split(a:word, '\zs')
+  let charlist = map(split(a:word, '\zs'), 's:escape(v:val)')
 
   " swapped
   let items = []
