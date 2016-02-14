@@ -81,7 +81,7 @@ function! s:vimhelp_lint(bang) abort "{{{
   finally
     let &l:buftype = buftype
   endtry
-  call s:sort(filter(qflist, 'v:val != {}'), 's:compare_pos')
+  call s:sort(filter(qflist, 'v:val != {}'), 's:compare_qfitems')
 
   call setqflist(qflist, 'r')
   if qflist != []
@@ -518,24 +518,14 @@ function! s:compare_bufnr_and_name(i1, i2) abort  "{{{
   if a:i1.bufnr != a:i2.bufnr
     let result = a:i1.bufnr - a:i2.bufnr
   else
-    let chars1 = map(split(a:i1.name, '\zs'), 'char2nr(v:val)')
-    let chars2 = map(split(a:i2.name, '\zs'), 'char2nr(v:val)')
-    let len1   = len(chars1)
-    let len2   = len(chars2)
-    let result = len1 - len2
-    for i in range(min([len1, len2]))
-      if chars1[i] != chars2[i]
-        let result = chars1[i] - chars2[i]
-        break
-      endif
-    endfor
+    let result = s:compare_string(a:i1.name, a:i2.name)
   endif
   return result
 endfunction
 "}}}
 function! s:compare_qfitems(i1, i2) abort "{{{
   if a:i1.bufnr != a:i2.bufnr
-    let result a:i1.bufnr - a:i2.bufnr
+    let result = s:compare_string(bufname(a:i1.bufnr), bufname(a:i2.bufnr))
   else
     let pos1 = [a:i1.lnum, a:i1.col]
     let pos2 = [a:i2.lnum, a:i2.col]
@@ -547,6 +537,21 @@ function! s:compare_qfitems(i1, i2) abort "{{{
       let result = 0
     endif
   endif
+  return result
+endfunction
+"}}}
+function! s:compare_string(s1, s2) abort  "{{{
+  let chars1 = map(split(a:s1, '\zs'), 'char2nr(v:val)')
+  let chars2 = map(split(a:s2, '\zs'), 'char2nr(v:val)')
+  let len1   = len(chars1)
+  let len2   = len(chars2)
+  let result = len1 - len2
+  for i in range(min([len1, len2]))
+    if chars1[i] != chars2[i]
+      let result = chars1[i] - chars2[i]
+      break
+    endif
+  endfor
   return result
 endfunction
 "}}}
