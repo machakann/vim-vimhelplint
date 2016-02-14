@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 14-Feb-2016.
+" Last Change: 15-Feb-2016.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -26,31 +26,6 @@ let b:loaded_ftplugin_help_lint = 1
 
 command! -bang -buffer -bar -nargs=0 VimhelpLint     call s:vimhelp_lint('<bang>')
 command!       -buffer -bar -nargs=0 VimhelpLintEcho call s:vimhelp_lint_echo()
-
-" for vim-watchdogs "{{{
-if exists(':WatchdogsRun') == 2
-  function! s:get_plugin_dir() abort  "{{{
-    return s:plugin_path
-  endfunction
-  "}}}
-  function! s:integrate_watchdog_config() abort "{{{
-    if !exists('g:quickrun_config')
-      let g:quickrun_config = {}
-    endif
-    call extend(g:quickrun_config, s:vimhelplint_watchdogs_checker)
-  endfunction
-  "}}}
-  let s:plugin_path = expand('<sfile>:h:h')
-  let s:vimhelplint_watchdogs_checker = {
-        \   'watchdogs_checker/vimhelplint' : {
-        \     'command': 'vim',
-        \     'exec' : '%C -X -N -u NONE -i NONE -V1 -e -s -c "set rtp+=' . s:get_plugin_dir() . '" -c "silent filetype plugin on" -c "silent edit %s" -c "VimhelpLintEcho" -c "qall!"',
-        \     'errorformat': '%f:%l:%c:%trror:%n: %m,%f:%l:%c:%tarning:%n: %m,%f:%l:%c:%m',
-        \    },
-        \ }
-  call s:integrate_watchdog_config()
-endif
-"}}}
 
 if exists("*\<SID>vimhelp_lint")
   finish
@@ -607,6 +582,31 @@ endfunction
 function! s:is_ahead(pos1, pos2) abort  "{{{
   return a:pos1[0] > a:pos2[0] || (a:pos1[0] == a:pos2[0] && a:pos1[1] > a:pos2[1])
 endfunction
+"}}}
+
+" for vim-watchdogs "{{{
+if exists(':WatchdogsRun') == 2
+  function! s:get_plugin_dir() abort  "{{{
+    return s:plugin_path
+  endfunction
+  "}}}
+  function! s:integrate_watchdog_config() abort "{{{
+    if !exists('g:quickrun_config')
+      let g:quickrun_config = {}
+    endif
+    call extend(g:quickrun_config, s:vimhelplint_watchdogs_checker)
+  endfunction
+  "}}}
+  let s:plugin_path = expand('<sfile>:h:h')
+  let s:vimhelplint_watchdogs_checker = {
+        \   'watchdogs_checker/vimhelplint' : {
+        \     'command': 'vim',
+        \     'exec' : '%C -X -N -u NONE -i NONE -V1 -e -s -c "set rtp+=' . s:get_plugin_dir() . '" -c "silent filetype plugin on" -c "silent edit %s" -c "VimhelpLintEcho" -c "qall!"',
+        \     'errorformat': '%f:%l:%c:%trror:%n: %m,%f:%l:%c:%tarning:%n: %m,%f:%l:%c:%m',
+        \    },
+        \ }
+  call s:integrate_watchdog_config()
+endif
 "}}}
 
 " vim:set foldmethod=marker:
