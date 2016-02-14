@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 13-Feb-2016.
+" Last Change: 14-Feb-2016.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -24,7 +24,33 @@ if &compatible || exists('b:loaded_ftplugin_help_lint')
 endif
 let b:loaded_ftplugin_help_lint = 1
 
-command! -bang -buffer -bar -nargs=0 VimhelpLint call s:vimhelp_lint('<bang>')
+command! -bang -buffer -bar -nargs=0 VimhelpLint     call s:vimhelp_lint('<bang>')
+command!       -buffer -bar -nargs=0 VimhelpLintEcho call s:vimhelp_lint_echo()
+
+" for vim-watchdogs "{{{
+if exists(':WatchdogsRun') == 2
+  function! s:get_plugin_dir() abort  "{{{
+    return s:plugin_path
+  endfunction
+  "}}}
+  function! s:integrate_watchdog_config() abort "{{{
+    if !exists('g:quickrun_config')
+      let g:quickrun_config = {}
+    endif
+    call extend(g:quickrun_config, s:vimhelplint_watchdogs_checker)
+  endfunction
+  "}}}
+  let s:plugin_path = expand('<sfile>:h:h')
+  let s:vimhelplint_watchdogs_checker = {
+        \   'watchdogs_checker/vimhelplint' : {
+        \     'command': 'vim',
+        \     'exec' : '%C -X -N -u NONE -i NONE -V1 -e -s -c "set rtp+=' . s:get_plugin_dir() . '" -c "silent filetype plugin on" -c "silent edit %s" -c "VimhelpLintEcho" -c "qall!"',
+        \     'errorformat': '%f:%l:%c:%trror:%n: %m,%f:%l:%c:%tarning:%n: %m,%f:%l:%c:%m',
+        \    },
+        \ }
+  call s:integrate_watchdog_config()
+endif
+"}}}
 
 if exists("*\<SID>vimhelp_lint")
   finish
@@ -39,16 +65,7 @@ else
   let s:has_patch_7_4_358 = v:version == 704 && has('patch358')
 endif
 
-function! s:vimhelp_lint(bang) abort "{{{
-  " NOTE: Error number list
-  "         1: A duplicate tag within this file
-  "         2: A duplicate tag with another file
-
-  if &filetype !=# 'help'
-    call s:echo('This is not a help file!', 'ErrorMsg')
-    return
-  endif
-
+function! VimhelpLintGetQflist() abort "{{{
   let qflist = []
 
   """ gather hyper texts
@@ -57,7 +74,7 @@ function! s:vimhelp_lint(bang) abort "{{{
   let path_expr = printf('%s%s*.%s', expand('%:h'), separator, expand('%:e'))
   let hypertext_in_files = []
   for doc in glob(path_expr, 1, 1)
-    let bufnr = bufnr(doc, !bufexists(doc))
+    silent let bufnr = bufnr(doc, !bufexists(doc))
     let hypertext_in_files += s:extract_hypertexts(bufnr)
     let qflist += map(range(1, line('$')), 's:checker_for_style(v:val, bufnr)')
   endfor
@@ -82,6 +99,16 @@ function! s:vimhelp_lint(bang) abort "{{{
     let &l:buftype = buftype
   endtry
   call s:sort(filter(qflist, 'v:val != {}'), 's:compare_qfitems')
+  return qflist
+endfunction
+"}}}
+function! s:vimhelp_lint(bang) abort  "{{{
+  if &filetype !=# 'help'
+    call s:echo('This is not a help file!', 'ErrorMsg')
+    return
+  endif
+
+  let qflist = VimhelpLintGetQflist()
 
   call setqflist(qflist, 'r')
   if qflist != []
@@ -96,8 +123,28 @@ function! s:vimhelp_lint(bang) abort "{{{
   endif
 endfunction
 "}}}
+function! s:vimhelp_lint_echo() abort "{{{
+  if &filetype !=# 'help'
+    call s:echo('This is not a help file!', 'ErrorMsg')
+    return
+  endif
+
+  let qflist = VimhelpLintGetQflist()
+
+  for qfitem in qflist
+    let bufname = bufname(qfitem.bufnr)
+    let lnum    = qfitem.lnum
+    let col     = qfitem.col
+    let e_or_w  = qfitem.type ==# 'E' ? 'Error' : 'Warning'
+    let nr      = qfitem.nr
+    let text    = qfitem.text
+    let msg = printf('%s:%d:%d:%s:%d:%s', bufname, lnum, col, e_or_w, nr, text)
+    echo msg
+  endfor
+endfunction
+"}}}
 function! s:extract_hypertexts(bufnr) abort  "{{{
-  execute 'buffer ' . a:bufnr
+  execute 'silent buffer ' . a:bufnr
 
   let hypertext_in_files = []
   let lines   = getline(1, line('$'))
@@ -188,7 +235,7 @@ endfunction
 "}}}
 function! s:winrestview(view) abort "{{{
   let [bufnr, view] = a:view
-  execute 'buffer ' . bufnr
+  execute 'silent buffer ' . bufnr
   call winrestview(view)
 endfunction
 "}}}
@@ -246,6 +293,7 @@ endfunction
 function! s:checker_for_style(lnum, bufnr) abort "{{{
   let qfitem = {}
   if strdisplaywidth(getline(a:lnum)) > 78
+    " [Error 1]
     let text = 'The width of a line should be no longer than 78.'
     let qfitem = s:qfitem(1, 'W', a:bufnr, a:lnum, 1, text)
   endif
@@ -341,6 +389,7 @@ function! s:qfitem(nr, type, bufnr, lnum, col, text) abort  "{{{
        \   'col'   : a:col,
        \   'vcol'  : 0,
        \   'text'  : a:text,
+       \   'valid' : 1,
        \ }
 endfunction
 "}}}
