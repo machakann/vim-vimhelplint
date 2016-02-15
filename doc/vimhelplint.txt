@@ -1,5 +1,5 @@
 *vimhelplint.txt*	A lint tool for vim help files.
-						Last change:14-Feb-2016.
+						Last change:15-Feb-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -55,7 +55,7 @@ syntastic~
 |syntastic| (https://github.com/scrooloose/syntastic) is a plugin to do syntax
 check automatically. Install it and write a line to vimrc.
 >
-	let g:syntastic_help_checkers = ['help']
+	let g:syntastic_help_checkers = ['vimhelplint']
 <
 
 ==============================================================================

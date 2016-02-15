@@ -1,5 +1,5 @@
 *vimhelplint.jax*	Vim ヘルプファイル用の静的構文チェック
-						Last change:14-Feb-2016.
+						Last change:15-Feb-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL ライセンス
@@ -58,7 +58,7 @@ syntastic~
 行うためのプラグインです。 |syntastic| をインストールし、次の設定を vimrc に追
 加してください。
 >
-	let g:syntastic_help_checkers = ['help']
+	let g:syntastic_help_checkers = ['vimhelplint']
 <
 
 ==============================================================================
