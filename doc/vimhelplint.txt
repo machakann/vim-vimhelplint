@@ -1,5 +1,5 @@
 *vimhelplint.txt*	A lint tool for vim help files.
-						Last change:15-Feb-2016.
+						Last change:16-Feb-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -27,6 +27,14 @@ so on to find errors. If user add bang (!) to the command, it opens
 >
 	:VimhelpLint!
 <
+
+If the editing file is not so big, it might be convenient to run syntax check
+automatically when user |:write| the file.
+>
+	autocmd BufWritePost */doc/*.txt :silent VimhelpLint!
+<
+However please remember that |:VimhelpLint| command sometimes gets heavy.
+
 ==============================================================================
 COOPERATION WITH OTHER PLUGINS		*vimhelplint-cooperation*
 

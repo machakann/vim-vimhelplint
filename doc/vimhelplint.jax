@@ -1,5 +1,5 @@
 *vimhelplint.jax*	Vim ヘルプファイル用の静的構文チェック
-						Last change:15-Feb-2016.
+						Last change:16-Feb-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL ライセンス
@@ -27,6 +27,15 @@ USAGE					*vimhelplint-usage*
 >
 	:VimhelpLint!
 <
+
+もし編集中のファイルがあまり大きくなければ自動的にチェックを走らせるのも便利か
+もしれません。
+>
+	autocmd BufWritePost */doc/*.txt :silent VimhelpLint!
+<
+ただし、残念ながら |:VimhelpLint| コマンドはしばしば時間がかかってしまうことが
+あることを留意しておいてください。
+
 ==============================================================================
 COOPERATION WITH OTHER PLUGINS		*vimhelplint-cooperation*
 
