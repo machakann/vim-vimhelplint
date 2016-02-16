@@ -9,12 +9,19 @@
 必要要件:	Vim 7.4 かそれ以降の Vim エディタであること
 
 ==============================================================================
+INDEX					*vimhelplint-index*
+
+USAGE					|vimhelplint-usage|
+COMMANDS				|vimhelplint-commands|
+FUNCTIONS				|vimhelplint-functions|
+COOPERATION WITH OTHER PLUGINS		|vimhelplint-cooperation|
+
+==============================================================================
 USAGE					*vimhelplint-usage*
 
 *vimhelplint* は静的構文チェックを行うためのVimヘルプファイル用ファイルタイプ
 プラグインです。
 
-					*:VimhelpLint*
 このプラグインはコマンド |:VimhelpLint| を定義します。このコマンドは編集中のフ
 ァイル、およびそのファイルと同じフォルダに存在するヘルプファイルをチェックしま
 す。
@@ -35,6 +42,27 @@ USAGE					*vimhelplint-usage*
 <
 ただし、残念ながら |:VimhelpLint| コマンドはしばしば時間がかかってしまうことが
 あることを留意しておいてください。
+
+==============================================================================
+COMMANDS				*vimhelplint-commands*
+
+:VimhelpLint				*:VimhelpLint*
+	構文チェックを実行し、エラーを |quickfix| リストへ送ります。
+	! 修飾子 |:command-bang| 付きで実行された場合は、エラーがあれば
+	|quickfix-window| を開き、なければこれを閉じます。
+
+:VimhelpLintEcho			*:VimhelpLintEcho*
+	構文チェックを実行し、結果を表示します。このメッセージは次の
+	'errorformat' パターンによって解釈できる形式で出力されます。
+>
+	set efm=%f:%l:%c:%trror:%n: %m,%f:%l:%c:%tarning:%n: %m
+<
+==============================================================================
+FUNCTIONS				*vimhelplint-functions*
+
+VimhelpLintGetQflist()			*VimhelpLintGetQflist()*
+	編集中のヘルプファイルのエラーをリストにして返します。返り値は
+	|setqflist()| の引数とすることのできる形式です。
 
 ==============================================================================
 COOPERATION WITH OTHER PLUGINS		*vimhelplint-cooperation*

@@ -9,12 +9,19 @@ License : NYSL license
 Requirement:	Vim 7.4 or higher
 
 ==============================================================================
+INDEX					*vimhelplint-index*
+
+USAGE					|vimhelplint-usage|
+COMMANDS				|vimhelplint-commands|
+FUNCTIONS				|vimhelplint-functions|
+COOPERATION WITH OTHER PLUGINS		|vimhelplint-cooperation|
+
+==============================================================================
 USAGE					*vimhelplint-usage*
 
 *vimhelplint* is a filetype plugin for vim help files to carry out static
-check.
+syntax check.
 
-					*:VimhelpLint*
 This plugin defines a command |:VimhelpLint|, the command checks
 the help file that user is editing (and the files in the same folder with it)
 are checked.
@@ -34,6 +41,27 @@ automatically when user |:write| the file.
 	autocmd BufWritePost */doc/*.txt :silent VimhelpLint!
 <
 However please remember that |:VimhelpLint| command sometimes gets heavy.
+
+==============================================================================
+COMMANDS				*vimhelplint-commands*
+
+:VimhelpLint				*:VimhelpLint*
+	Runs syntax check and add errors to |quickfix| list. If user executes
+	this command with '!' modifier |:command-bang|, it opens
+	|quickfix-window| with errors or closes the window without errors.
+
+:VimhelpLintEcho			*:VimhelpLintEcho*
+	Runs syntax check and echo results. The messages are formatted as
+	resolved by the following 'errorformat' patterns.
+>
+	set efm=%f:%l:%c:%trror:%n: %m,%f:%l:%c:%tarning:%n: %m
+<
+==============================================================================
+FUNCTIONS				*vimhelplint-functions*
+
+VimhelpLintGetQflist()			*VimhelpLintGetQflist()*
+	Returns a list of errors in the editing help files. The returned list
+	could be an argument of |setqflist()|.
 
 ==============================================================================
 COOPERATION WITH OTHER PLUGINS		*vimhelplint-cooperation*
