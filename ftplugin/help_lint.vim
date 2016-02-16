@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 15-Feb-2016.
+" Last Change: 16-Feb-2016.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -87,14 +87,15 @@ function! s:vimhelp_lint(bang) abort  "{{{
 
   call setqflist(qflist, 'r')
   if qflist != []
-    if a:bang ==# '!'
-      copen
-    endif
     call s:hier('on')
     call s:echo(printf('%d errors have been found!', len(qflist)), 'WarningMsg')
   else
     call s:hier('off')
     call s:echo('No errors.')
+  endif
+
+  if a:bang ==# '!'
+    cwindow
   endif
 endfunction
 "}}}
