@@ -1,5 +1,5 @@
 *vimhelplint.txt*	A lint tool for vim help files.
-						Last change:16-Feb-2016.
+						Last change:17-Feb-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -12,6 +12,7 @@ Requirement:	Vim 7.4 or higher
 INDEX					*vimhelplint-index*
 
 USAGE					|vimhelplint-usage|
+ERROR LIST				|vimhelplint-error-list|
 COMMANDS				|vimhelplint-commands|
 FUNCTIONS				|vimhelplint-functions|
 COOPERATION WITH OTHER PLUGINS		|vimhelplint-cooperation|
@@ -41,6 +42,29 @@ automatically when user |:write| the file.
 	autocmd BufWritePost */doc/*.txt :silent VimhelpLint!
 <
 However please remember that |:VimhelpLint| command sometimes gets heavy.
+
+==============================================================================
+ERROR LIST				*vimhelplint-error-list*
+
+No.	Type		Note~
+------------------------------------------------------------------------------
+   1	Warning		The line is too long. According to the recommended
+			style, it should be no longer than 78. |help-writing|
+			The breakings "\n" at 79th column is allowed.
+
+   2	Error		The tag is duplicate with another in the same file.
+
+   3	Error		The tag is duplicate with another in a external help.
+
+   4	Error		An orphan link. No corresponding tag has found.
+
+   5	Warning		The link probably works, but it is not an exact form.
+			A scope prefix may be dropped.
+
+   6	Warning		The link probably works, but it is not an exact form.
+------------------------------------------------------------------------------
+
+The list of error items might be updated in the future.
 
 ==============================================================================
 COMMANDS				*vimhelplint-commands*
