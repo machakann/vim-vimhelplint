@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 16-Feb-2016.
+" Last Change: 17-Feb-2016.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -268,7 +268,7 @@ endfunction
 "}}}
 function! s:checker_for_style(lnum, bufnr) abort "{{{
   let qfitem = {}
-  if strdisplaywidth(getline(a:lnum)) > 78
+  if strdisplaywidth(getline(a:lnum)) > 79
     " [Error 1]
     let text = 'The width of a line should be no longer than 78.'
     let qfitem = s:qfitem(1, 'W', a:bufnr, a:lnum, 1, text)
