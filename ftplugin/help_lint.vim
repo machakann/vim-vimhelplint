@@ -16,8 +16,8 @@
 "       2 :  Error  : Duplicate tags in the same file.
 "       3 :  Error  : Duplicate tags in another file.
 "       4 :  Error  : A hot link is not linked to any tags.
-"       5 : Warning : A hot link seems mis-typed.
-"       6 : Warning : A tag seems to have inconsistency with a link on scope prefix.
+"       5 : Warning : A tag seems to have inconsistency with a link on scope prefix.
+"       6 : Warning : A hot link seems mis-typed.
 
 if &compatible || exists('b:loaded_ftplugin_help_lint')
   finish
@@ -331,25 +331,28 @@ function! s:checker_for_links(link, taglist) abort  "{{{
       " FIXME: It might be unnecessary.
       let likely = s:analogize(a:link, a:taglist)
 
-      if likely == {}
+      let err_nr = get(likely, 'error', 0)
+      if err_nr == 4
         " [Error 4]
-        let likely = s:analogize(a:link, a:taglist, 1)
-        if likely == {}
-          let text = printf('A link "%s" does not have a corresponding tag.', a:link.name)
-        else
+        if has_key(likely, 'name')
           let text = printf('A link "%s" does not have a corresponding tag. Isn''t it "%s"?', a:link.name, likely.name)
+        else
+          let text = printf('A link "%s" does not have a corresponding tag.', a:link.name)
         endif
         let qfitem = s:qfitem(4, 'E', bufnr, lnum, idx, text)
+      elseif err_nr == 5
+        " [Error 5]
+        " FIXME: This is probably wrong with the tag although here is in the
+        "        link checker. Should cursor move to tag?
+        let text = printf('A link "%s" does not have a corresponding tag. Isn''t it "%s"? Or a scope prefix missing at the tag?', likely.name, a:link.name)
+        let qfitem = s:qfitem(5, 'W', bufnr, lnum, idx, text)
+      elseif err_nr == 6
+        " [Error 6]
+        let text = printf('A link "%s" does not have a corresponding tag. Isn''t it "%s"?', a:link.name, likely.name)
+        let qfitem = s:qfitem(6, 'W', bufnr, lnum, idx, text)
       else
-        if get(likely, 'error', 4) == 4
-          " [Error 5]
-          let text = printf('A link "%s" does not have a corresponding tag. Isn''t it "%s"?', a:link.name, likely.name)
-          let qfitem = s:qfitem(5, 'W', bufnr, lnum, idx, text)
-        else
-          " [Error 6]
-          let text = printf('There is a tag "%s". Is it consistent with a link "%s"?', likely.name, a:link.name)
-          let qfitem = s:qfitem(6, 'W', bufnr, lnum, idx, text)
-        endif
+        " should not reach here
+        let qfitem = {}
       endif
     endif
   endif
@@ -370,8 +373,9 @@ function! s:qfitem(nr, type, bufnr, lnum, col, text) abort  "{{{
 endfunction
 "}}}
 function! s:analogize(link, taglist, ...) abort "{{{
+  let is_deep = get(a:000, 0, 0)
   let escaped = s:escape(a:link.name)
-  if !get(a:000, 0, 0)
+  if !is_deep
     " assume the link as a name of a valiable without a scope prefix
     if a:link.name =~# '^[bgtw]:\h[[:alnum:]_#]\{2,}$'
       let pattern = printf('^%s$', escaped[2:])
@@ -382,6 +386,7 @@ function! s:analogize(link, taglist, ...) abort "{{{
     endif
 
     " simplely analogize
+    let err_nr = {'error': 6}
     if a:link.name =~# '^\h\%(\w\+[_#]\)\+\w\+\%(()\)\?$'
       let pattern = printf('^[bgtw]:%s\%(()\)\?$', escaped)
     elseif a:link.name =~# '^\h\w*$'
@@ -391,6 +396,7 @@ function! s:analogize(link, taglist, ...) abort "{{{
     endif
   else
     " deeply analogize
+    let err_nr = {'error': 4}
     if a:link.name =~# '''^[:alpha:]\{2,}$'''
       let word = matchstr(a:link.name, '''\zs[:alpha:]\{2,}\ze''')
       let pattern = printf('''%s''', s:fuzzy_pattern(word))
@@ -432,7 +438,12 @@ function! s:analogize(link, taglist, ...) abort "{{{
     else
       echoerr errormsg
     endif
-    return likely
+
+    if !is_deep
+      return likely == {} ? s:analogize(a:link, a:taglist, 1) : extend(likely, err_nr)
+    else
+      return extend(likely, err_nr)
+    endif
   endtry
 endfunction
 "}}}
