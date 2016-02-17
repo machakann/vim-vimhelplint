@@ -268,7 +268,7 @@ endfunction
 "}}}
 function! s:checker_for_style(lnum, bufnr) abort "{{{
   let qfitem = {}
-  if strdisplaywidth(getline(a:lnum)) > 79
+  if strdisplaywidth(getline(a:lnum)) > 78
     " [Error 1]
     let text = 'The width of a line should be no longer than 78.'
     let qfitem = s:qfitem(1, 'W', a:bufnr, a:lnum, 1, text)
