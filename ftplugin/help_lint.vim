@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 17-Feb-2016.
+" Last Change: 10-Mar-2016.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -18,6 +18,7 @@
 "       4 :  Error  : A hot link is not linked to any tags.
 "       5 : Warning : A tag seems to have inconsistency with a link on scope prefix.
 "       6 : Warning : A hot link seems mis-typed.
+"       7 :  Error  : The link of an option name is not jumpable. Need a space before the former quote.
 
 if &compatible || exists('b:loaded_ftplugin_help_lint')
   finish
@@ -174,7 +175,7 @@ function! s:extract_a_kind_of_hypertexts(lnum, line, kind, pattern, ...) abort  
     if start > -1
       let str = matchstr(a:line, a:pattern, 0, l:count)
       if exceptpat ==# '' || !s:is_except_pattern(a:line, exceptpat, start)
-        let list += [{'kind': a:kind, 'name': str, 'lnum': a:lnum, 'start': start}]
+        let list += [{'kind': a:kind, 'name': str, 'lnum': a:lnum, 'start': start, 'line': a:line}]
       endif
     else
       break
@@ -308,6 +309,7 @@ function! s:checker_for_links(link, taglist) abort  "{{{
   let bufname = a:link.bufname
   let lnum    = a:link.lnum
   let idx     = a:link.start
+  let line    = a:link.line
 
   let qfitem = {}
   if count(a:taglist, a:link.name, 0) < 1
@@ -355,6 +357,17 @@ function! s:checker_for_links(link, taglist) abort  "{{{
         let qfitem = {}
       endif
     endif
+  endif
+
+  let not_jumpable = s:extract_a_kind_of_hypertexts(lnum, line, 'link', '\C[^ \t"*|]''\%([a-z]\{2,}\|t_..\)''', '\s*\zs.\{-}\ze\s\=\~$')
+  if not_jumpable != []
+    " [Error 7]
+    let col = not_jumpable[0].start
+    let head = max([0, col-5])
+    let tail = stridx(line, "'", col+2)
+    let corrected = line[head : col] . ' ' . line[col+1 : tail]
+    let text = printf('The link would failure to jump by CTRL-]. Put a space before the quote, like "%s%s".', head == 0 ? '' : '~', corrected)
+    let qfitem = s:qfitem(7, 'E', bufnr, lnum, col, text)
   endif
   return qfitem
 endfunction
