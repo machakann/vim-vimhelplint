@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 10-Mar-2016.
+" Last Change: 13-Mar-2016.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -57,8 +57,9 @@ function! VimhelpLintGetQflist() abort "{{{
   call s:winrestview(view)
 
   """ clasify
-  let tags_in_files  = filter(copy(hypertext_in_files), 'v:val.kind ==# "tag"')
-  let links_in_files = filter(copy(hypertext_in_files), 'v:val.kind ==# "link"')
+  let tags_in_files    = filter(copy(hypertext_in_files), 'v:val.kind ==# "tag"')
+  let links_in_files   = filter(copy(hypertext_in_files), 'v:val.kind ==# "link"')
+  let options_in_files = filter(copy(hypertext_in_files), 'v:val.kind ==# "option"')
 
   """ check
   let taglist = map(copy(tags_in_files), 'v:val.name')
@@ -71,6 +72,10 @@ function! VimhelpLintGetQflist() abort "{{{
 
     " check links : A link should have a corresponding tag.
     let qflist += s:check(links_in_files, function('s:checker_for_links'), taglist)
+
+    " check options : A option should have a corresponding tag.
+    let qflist += s:check(options_in_files, function('s:checker_for_links'), taglist)
+    let qflist += filter(map(copy(options_in_files), 's:checker_for_options(v:val)'), 'v:val != {}')
   finally
     let &l:buftype = buftype
   endtry
@@ -158,8 +163,8 @@ function! s:extract_hypertexts_from_a_line(lnum, line) abort  "{{{
   " extract links
   let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'link', '\%(^\|[^\\]\)|\zs[#-)!+-{}~]\+\ze|', '\%(|||\|.*====*|\|:|vim:|\)')
 
-  " extract options as link
-  let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'link', '\C''\%([a-z]\{2,}\|t_..\)''', '\s*\zs.\{-}\ze\s\=\~$')
+  " extract options
+  let list += s:extract_a_kind_of_hypertexts(a:lnum, a:line, 'option', '\C''\%([a-z]\{2,}\|t_..\)''', '\s*\zs.\{-}\ze\s\=\~$')
 
   return list
 endfunction
@@ -358,15 +363,25 @@ function! s:checker_for_links(link, taglist) abort  "{{{
       endif
     endif
   endif
+  return qfitem
+endfunction
+"}}}
+function! s:checker_for_options(option) abort  "{{{
+  let bufnr   = a:option.bufnr
+  let bufname = a:option.bufname
+  let lnum    = a:option.lnum
+  let line    = a:option.line
 
-  let not_jumpable = s:extract_a_kind_of_hypertexts(lnum, line, 'link', '\C[^ \t"*|]''\%([a-z]\{2,}\|t_..\)''', '\s*\zs.\{-}\ze\s\=\~$')
-  if not_jumpable != []
+  let qfitem = {}
+  let options = s:extract_a_kind_of_hypertexts(lnum, line, 'link', '[\x01-\x08\x0A-\x1F\x21\x23-\x29\x2B-\x7B\x7D\x7E]\zs''\C\%([a-z]\{2,}\|t_..\)''', '\s*\zs.\{-}\ze\s\=\~$')
+  let not_jumpable = get(options, 0, {})
+  if not_jumpable != {} && not_jumpable.name ==# a:option.name && not_jumpable.start == a:option.start
     " [Error 7]
-    let col = not_jumpable[0].start
-    let head = max([0, col-5])
-    let tail = stridx(line, "'", col+2)
-    let corrected = line[head : col] . ' ' . line[col+1 : tail]
-    let text = printf('The link would failure to jump by CTRL-]. Put a space before the quote, like "%s%s".', head == 0 ? '' : '~', corrected)
+    let col = not_jumpable.start
+    let former = split(line[: col-1], '\zs')
+    let latter = split(line[col :], '\zs')
+    let corrected = join(former[-5 :], '') . ' ' . join(latter[: match(latter, "'", 1)], '')
+    let text = printf('The link would failure to jump by CTRL-]. Put a space before the quote, like "%s%s".', len(former) < 5 ? '' : '~', corrected)
     let qfitem = s:qfitem(7, 'E', bufnr, lnum, col, text)
   endif
   return qfitem
