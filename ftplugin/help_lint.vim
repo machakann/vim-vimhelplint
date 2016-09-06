@@ -581,17 +581,16 @@ if s:has_patch_7_4_218
   endfunction
 else
   function! s:uniq(list, func) abort
+    let i = 0
     let len = len(a:list)
-    if len > 1
-      let i = 0
-      while i < len-1
-        if call(a:func, [a:list[i], a:list[i+1]]) == 0
-          call remove(a:list[i+1])
-        else
-          let i += 1
-        endif
-      endwhile
-    endif
+    while i < len-1
+      if call(a:func, [a:list[i], a:list[i+1]]) == 0
+        call remove(a:list, i+1)
+        let len -= 1
+      else
+        let i += 1
+      endif
+    endwhile
     return a:list
   endfunction
 endif
