@@ -269,7 +269,7 @@ function! s:check(targets, checker, taglist) abort "{{{
   " NOTE: The returned should be same as
   "       filter(map(copy(a:targets), 'a:checker(v:val, a:taglist)'), 'v:val != {}')
   "       but faster because removing duplicates.
-  let representatives = uniq(sort(deepcopy(a:targets), 's:compare_bufnr_and_name'), 's:compare_bufnr_and_name')
+  let representatives = s:uniq(s:sort(deepcopy(a:targets), 's:compare_bufnr_and_name'), 's:compare_bufnr_and_name')
   let qflist  = []
   for rep in representatives
     let result = a:checker(rep, a:taglist)
