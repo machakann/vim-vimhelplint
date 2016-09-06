@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 13-Mar-2016.
+" Last Change: 06-Sep-2016.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -34,9 +34,11 @@ endif
 
 " patches
 if v:version > 704 || (v:version == 704 && has('patch237'))
+  let s:has_patch_7_3_465 = has('patch-7.3.465')
   let s:has_patch_7_4_218 = has('patch-7.4.218')
   let s:has_patch_7_4_358 = has('patch-7.4.358')
 else
+  let s:has_patch_7_3_465 = v:version == 703 && has('patch465')
   let s:has_patch_7_4_218 = v:version == 704 && has('patch218')
   let s:has_patch_7_4_358 = v:version == 704 && has('patch358')
 endif
@@ -49,7 +51,7 @@ function! VimhelpLintGetQflist() abort "{{{
   let separator = has('win32') && !&shellslash ? '\' : '/'
   let path_expr = printf('%s%s*.%s', expand('%:h'), separator, expand('%:e'))
   let hypertext_in_files = []
-  for doc in glob(path_expr, 1, 1)
+  for doc in s:glob(path_expr, 1, 1)
     silent let bufnr = bufnr(doc, !bufexists(doc))
     let hypertext_in_files += s:extract_hypertexts(bufnr)
     let qflist += map(range(1, line('$')), 's:checker_for_style(v:val, bufnr)')
@@ -244,6 +246,22 @@ function! s:echo(str, ...) abort "{{{
   echo 'vimhelplint: ' . a:str
   echohl NONE
 endfunction
+"}}}
+" function! s:glob(expr, ...) abort "{{{
+if s:has_patch_7_3_465
+  function! s:glob(expr, ...) abort
+    let nosuf = get(a:000, 0, 0)
+    let list = get(a:000, 1, 0)
+    return glob(a:expr, nosuf, list)
+  endfunction
+else
+  function! s:glob(expr, ...) abort
+    let nosuf = get(a:000, 0, 0)
+    let list = get(a:000, 1, 0)
+    let paths = glob(a:expr, nosuf)
+    return list ? split(paths, "\<NL>") : paths
+  endfunction
+endif
 "}}}
 
 " checkers
