@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 06-Sep-2016.
+" Last Change: 30-Oct-2016.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -360,20 +360,20 @@ function! s:checker_for_links(link, taglist) abort  "{{{
       if err_nr == 4
         " [Error 4]
         if has_key(likely, 'name')
-          let text = printf('A link "%s" does not have a corresponding tag. Isn''t it "%s"?', a:link.name, likely.name)
+          let text = printf('A link "%s" does not have any corresponding tag. Isn''t it "%s"?', a:link.name, likely.name)
         else
-          let text = printf('A link "%s" does not have a corresponding tag.', a:link.name)
+          let text = printf('A link "%s" does not have any corresponding tag.', a:link.name)
         endif
         let qfitem = s:qfitem(4, 'E', bufnr, lnum, idx, text)
       elseif err_nr == 5
         " [Error 5]
         " FIXME: This is probably wrong with the tag although here is in the
         "        link checker. Should cursor move to tag?
-        let text = printf('A link "%s" does not have a corresponding tag. Isn''t it "%s"? Or a scope prefix missing at the tag?', likely.name, a:link.name)
+        let text = printf('A link "%s" does not have any corresponding tag. Isn''t it "%s"? Or a scope prefix missing at the tag?', likely.name, a:link.name)
         let qfitem = s:qfitem(5, 'W', bufnr, lnum, idx, text)
       elseif err_nr == 6
         " [Error 6]
-        let text = printf('A link "%s" does not have a corresponding tag. Isn''t it "%s"?', a:link.name, likely.name)
+        let text = printf('A link "%s" does not have any corresponding tag. Isn''t it "%s"?', a:link.name, likely.name)
         let qfitem = s:qfitem(6, 'W', bufnr, lnum, idx, text)
       else
         " should not reach here
