@@ -1,5 +1,5 @@
 *vimhelplint.txt*	A lint tool for vim help files.
-						Last change:17-Feb-2016.
+						Last change:24-Jan-2017.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -46,6 +46,8 @@ However please remember that |:VimhelpLint| command sometimes gets heavy.
 ==============================================================================
 ERROR LIST				*vimhelplint-error-list*
 
+The list of error items might be updated in the future.
+
 No.	Type		Note~
 ------------------------------------------------------------------------------
    1	Warning		The line is too long. According to the recommended
@@ -64,7 +66,14 @@ No.	Type		Note~
    6	Warning		The link probably works, but it is not an exact form.
 ------------------------------------------------------------------------------
 
-The list of error items might be updated in the future.
+The obsolete errors and warnings are listed below.
+
+No.	Type		Note~
+------------------------------------------------------------------------------
+   7	Error		"The link of an option name is not jumpable. Need a
+			space before the former quote."
+			This problem has been solved by patch-7.4.1568.
+------------------------------------------------------------------------------
 
 ==============================================================================
 COMMANDS				*vimhelplint-commands*

@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 30-Oct-2016.
+" Last Change: 24-Jan-2017.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -18,7 +18,7 @@
 "       4 :  Error  : A hot link is not linked to any tags.
 "       5 : Warning : A tag seems to have inconsistency with a link on scope prefix.
 "       6 : Warning : A hot link seems mis-typed.
-"       7 :  Error  : The link of an option name is not jumpable. Need a space before the former quote.
+" obsol 7 :  Error  : The link of an option name is not jumpable. Need a space before the former quote.
 
 if &compatible || exists('b:loaded_ftplugin_help_lint')
   finish
@@ -77,7 +77,6 @@ function! VimhelpLintGetQflist() abort "{{{
 
     " check options : A option should have a corresponding tag.
     let qflist += s:check(options_in_files, function('s:checker_for_links'), taglist)
-    let qflist += filter(map(copy(options_in_files), 's:checker_for_options(v:val)'), 'v:val != {}')
   finally
     let &l:buftype = buftype
   endtry
@@ -380,27 +379,6 @@ function! s:checker_for_links(link, taglist) abort  "{{{
         let qfitem = {}
       endif
     endif
-  endif
-  return qfitem
-endfunction
-"}}}
-function! s:checker_for_options(option) abort  "{{{
-  let bufnr   = a:option.bufnr
-  let bufname = a:option.bufname
-  let lnum    = a:option.lnum
-  let line    = a:option.line
-
-  let qfitem = {}
-  let options = s:extract_a_kind_of_hypertexts(lnum, line, 'link', '[\x01-\x08\x0A-\x1F\x21\x23-\x29\x2B-\x7B\x7D\x7E]\zs''\C\%([a-z]\{2,}\|t_..\)''', '\s*\zs.\{-}\ze\s\=\~$')
-  let not_jumpable = get(options, 0, {})
-  if not_jumpable != {} && not_jumpable.name ==# a:option.name && not_jumpable.start == a:option.start
-    " [Error 7]
-    let col = not_jumpable.start
-    let former = split(line[: col-1], '\zs')
-    let latter = split(line[col :], '\zs')
-    let corrected = join(former[-5 :], '') . ' ' . join(latter[: match(latter, "'", 1)], '')
-    let text = printf('The link would failure to jump by CTRL-]. Put a space before the quote, like "%s%s".', len(former) < 5 ? '' : '~', corrected)
-    let qfitem = s:qfitem(7, 'E', bufnr, lnum, col, text)
   endif
   return qfitem
 endfunction
