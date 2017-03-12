@@ -87,7 +87,7 @@ COMMANDS				*vimhelplint-commands*
 	Runs syntax check and echo results. The messages are formatted as
 	resolved by the following 'errorformat' patterns.
 >
-	set efm=%f:%l:%c:%trror:%n: %m,%f:%l:%c:%tarning:%n: %m
+	set efm=%f:%l:%c:%trror:%n:%m,%f:%l:%c:%tarning:%n:%m
 <
 ==============================================================================
 FUNCTIONS				*vimhelplint-functions*
