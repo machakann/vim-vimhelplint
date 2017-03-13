@@ -1,5 +1,5 @@
 *vimhelplint.jax*	Vim ヘルプファイル用の静的構文チェック
-						Last change:24-Jan-2017.
+						Last change:13-Mar-2017.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL ライセンス
@@ -88,7 +88,7 @@ COMMANDS				*vimhelplint-commands*
 	構文チェックを実行し、結果を表示します。このメッセージは次の
 	'errorformat' パターンによって解釈できる形式で出力されます。
 >
-	set efm=%f:%l:%c:%trror:%n: %m,%f:%l:%c:%tarning:%n: %m
+	set efm=%f:%l:%c:%trror:%n:%m,%f:%l:%c:%tarning:%n:%m
 <
 ==============================================================================
 FUNCTIONS				*vimhelplint-functions*

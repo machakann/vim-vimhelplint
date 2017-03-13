@@ -1,5 +1,5 @@
 *vimhelplint.txt*	A lint tool for vim help files.
-						Last change:24-Jan-2017.
+						Last change:13-Mar-2017.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -87,7 +87,7 @@ COMMANDS				*vimhelplint-commands*
 	Runs syntax check and echo results. The messages are formatted as
 	resolved by the following 'errorformat' patterns.
 >
-	set efm=%f:%l:%c:%trror:%n: %m,%f:%l:%c:%tarning:%n: %m
+	set efm=%f:%l:%c:%trror:%n:%m,%f:%l:%c:%tarning:%n:%m
 <
 ==============================================================================
 FUNCTIONS				*vimhelplint-functions*
