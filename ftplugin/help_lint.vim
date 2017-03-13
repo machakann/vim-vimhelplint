@@ -637,7 +637,7 @@ if exists(':WatchdogsRun') == 2
         \   'watchdogs_checker/vimhelplint' : {
         \     'command': 'vim',
         \     'exec' : '%C -X -N -u NONE -i NONE -V1 -e -s -c "set rtp+=' . s:get_plugin_dir() . '" -c "silent filetype plugin on" -c "silent edit %s" -c "VimhelpLintEcho" -c "qall!"',
-        \     'errorformat': '%f:%l:%c:%trror:%n: %m,%f:%l:%c:%tarning:%n: %m',
+        \     'errorformat': '%f:%l:%c:%trror:%n:%m,%f:%l:%c:%tarning:%n:%m',
         \    },
         \ }
   call s:integrate_watchdog_config()
