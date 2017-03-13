@@ -23,6 +23,20 @@
    quickfix list. You can use e.g. `:copen` to open the list then.
    Use `:VimhelpLint!` to open the quickfix window automatically.
 
+---
+
+Or if you are using [Neomake](https://github.com/neomake/neomake), run the shell command in the root directory of Neomake plugin.
+
+```
+make build/vimhelplint
+```
+
+Then it automatically downloads vimhelplint, you can run it by:
+
+```
+:Neomake vimhelplint
+```
+
 ## Integration in CI
 
 You can run the plugin automatically as follows, e.g. on Travis CI:

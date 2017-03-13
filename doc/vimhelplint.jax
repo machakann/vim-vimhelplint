@@ -131,5 +131,18 @@ syntastic~
 	let g:syntastic_help_checkers = ['vimhelplint']
 <
 
+Neomake~
+Neomake (https://github.com/neomake/neomake) は Neovim/Vim の両方に対応した構
+文チェックを非同期に行うためのフレームワークです。インストールの後、 Neomake
+のルートディレクトリで以下を実行すると vimhelplint を自動でダウンロードしま
+す。
+>
+	make build/vimhelplint
+<
+あとは次のコマンドで構文チェックを実行できます。詳しくは |Neomake.txt| を参照
+してください。
+>
+	:Neomake vimhelplint
+<
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:noet:
