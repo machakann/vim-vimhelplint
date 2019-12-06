@@ -64,6 +64,8 @@ No.	Type		Note~
 			A scope prefix may be dropped.
 
    6	Warning		The link probably works, but it is not an exact form.
+
+   8	Warning		An Vim's option should not be link notation.
 ------------------------------------------------------------------------------
 
 The obsolete errors and warnings are listed below.
