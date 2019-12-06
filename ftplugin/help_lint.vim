@@ -1,6 +1,6 @@
 " A lint tool for vim help files.
 " Maintainer:  Masaaki Nakamura <mckn{at}outlook.jp>
-" Last Change: 24-Jan-2017.
+" Last Change: 06-Dec-2019.
 " License:     NYSL license
 "              Japanese <http://www.kmonos.net/nysl/>
 "              English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
@@ -19,6 +19,7 @@
 "       5 : Warning : A tag seems to have inconsistency with a link on scope prefix.
 "       6 : Warning : A hot link seems mis-typed.
 " obsol 7 :  Error  : The link of an option name is not jumpable. Need a space before the former quote.
+"       8 : Warning : An Vim's option should not be link notation.
 
 if &compatible || exists('b:loaded_ftplugin_help_lint')
   finish
@@ -77,6 +78,9 @@ function! VimhelpLintGetQflist() abort "{{{
 
     " check options : A option should have a corresponding tag.
     let qflist += s:check(options_in_files, function('s:checker_for_links'), taglist)
+
+    " check linked options (|'option'|) : An option should not be link notation.
+    let qflist += s:check(links_in_files, function('s:checker_for_linked_options'), taglist)
   finally
     let &l:buftype = buftype
   endtry
@@ -381,6 +385,15 @@ function! s:checker_for_links(link, taglist) abort  "{{{
     endif
   endif
   return qfitem
+endfunction
+"}}}
+function! s:checker_for_linked_options(link, taglist) abort  "{{{
+  if a:link.name =~# '^''\w\+''$'
+    " [Error 8]
+    let text = printf('An option |%s| should not be link notation.', a:link.name)
+    return s:qfitem(8, 'W', a:link.bufnr, a:link.lnum, a:link.start, text)
+  endif
+  return {}
 endfunction
 "}}}
 function! s:qfitem(nr, type, bufnr, lnum, col, text) abort  "{{{
