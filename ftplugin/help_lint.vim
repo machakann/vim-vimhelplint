@@ -147,7 +147,7 @@ function! s:extract_hypertexts(bufnr) abort  "{{{
     if !skip
       let scraped += s:extract_hypertexts_from_a_line(lnum, line)
 
-      if line =~# '\%(^\| \)>$'
+      if line =~# '\%(^\| \)>[a-z0-9]*$'
         let skip = 1
       endif
     endif
